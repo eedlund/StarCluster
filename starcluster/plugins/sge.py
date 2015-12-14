@@ -255,11 +255,9 @@ class SGEPlugin(clustersetup.DefaultClusterSetup):
         """
         self._master = master
         self._nodes = nodes
-
-        qhosts = master.ssh.execute("qhost", source_profile=True)
-        qhosts = qhosts[3:]
-        qhosts = [line.split(' ')[0] for line in qhosts]
-
+        qhosts = self._master.ssh.execute(
+            'qhost | tail -n +4 | cut -d " " -f 1 | sed s/^[\\ ]*//g',
+            source_profile=True)
         if len(qhosts) == 0:
             log.info("Nothing to clean")
 

@@ -29,7 +29,6 @@ import tempfile
 import boto
 import boto.ec2
 import boto.s3.connection
-from boto.exception import EC2ResponseError
 from boto import config as boto_config
 from boto.connection import HAVE_HTTPS_CONNECTION
 
@@ -776,27 +775,8 @@ class EasyEC2(EasyAWS):
                 return []  # Haven't created the security group in aws yet
             del filters['group-name']
 
-        for i in xrange(5):
-            try:
-                reservations = self.conn.get_all_instances(instance_ids,
-                                                           filters=filters)
-                break
-            except EC2ResponseError as e:
-                if instance_ids:
-                    log.error("instance_ids filtering based on: "
-                              + str(instance_ids))
-                    raise e
-
-                # handles a case where amazon returns an error based on
-                # instance_ids filtering even though no instance_ids were
-                # provided
-                log.exception("Amazon had a problem processing the request. "
-                              "Trying again in 1 second.")
-                time.sleep(1)
-        else:
-            log.error("Amazon still replying an error after 5 attempts.")
-            raise e
-
+        reservations = self.conn.get_all_instances(instance_ids,
+                                                   filters=filters)
         instances = []
         for res in reservations:
             insts = res.instances

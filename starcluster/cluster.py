@@ -436,7 +436,8 @@ class Cluster(object):
                  config_on_master=False,
                  dns_suffix=None,
                  node_instance_array=[],
-                 impaired_threshold_sec=120):
+                 impaired_threshold_sec=120,
+                 **kwargs):
         # update class vars with given vars
         _vars = locals().copy()
         for k in ['cluster_group', 'ec2_conn', 'node_image_id',
@@ -637,10 +638,6 @@ class Cluster(object):
         for key in kwargs.keys():
             if hasattr(self, key):
                 self.__dict__[key] = kwargs[key]
-            else:
-                msg = "Unknown configuration key: " + key
-                log.error(msg)
-                raise Exception("Unknown configuration key: " + key)
 
     def get(self, name):
         return self.__dict__.get(name)
