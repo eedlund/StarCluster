@@ -131,6 +131,9 @@ class StreamingNodeAdd(object):
 
     def stream_ready_instances(self):
         for ready_instance in self.ready_instances:
+            if (ready_instance.alias == 'master'):
+                log.error("Load balancer is attempting to add existing master node to cluster. Skipping this node...")
+                continue
             log.info("Adding node: %s" % ready_instance.alias)
             up_nodes = filter(lambda n: n.is_up(), self.cluster.nodes)
             try:
